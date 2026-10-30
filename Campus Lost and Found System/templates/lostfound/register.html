@@ -1,0 +1,684 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}用户注册 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div class="register-layout">
+    <!-- 左侧信息区域 -->
+    <div class="register-left">
+        <div class="info-content">
+            <div class="brand-section">
+                <div class="brand-icon">📝</div>
+                <h1>用户注册</h1>
+                <p class="brand-desc">User Registration</p>
+            </div>
+            
+            <div class="info-list">
+                <div class="info-item">
+                    <h3>数据隔离</h3>
+                    <p>注册时必须选择所属学校，注册后不可更改。登录后只能查看和操作本校的失物招领信息。</p>
+                </div>
+                
+                <div class="info-item">
+                    <h3>真实信息</h3>
+                    <p>请使用真实信息注册，便于失物认领时的身份核实。学号和联系电话建议填写。</p>
+                </div>
+                
+                <div class="info-item">
+                    <h3>用户权限</h3>
+                    <p>注册成功后默认为普通用户角色。如需管理员权限，请联系学校管理员。</p>
+                </div>
+            </div>
+            
+            <div class="note">
+                <p>仅供在校师生使用</p>
+                <p>仅支持武汉市内大学</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧表单区域 -->
+    <div class="register-right">
+        <div class="register-container">
+            <div class="register-header">
+                <h2>创建账号</h2>
+                <p>Create your account</p>
+            </div>
+            
+            <form method="post" class="register-form">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="{{ form.username.id_for_label }}">
+                            <span class="required">*</span> {{ form.username.label }}
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <small class="field-hint">用户名将作为您的登录凭证</small>
+                    </div>
+                </div>
+
+                <div class="form-row two-cols">
+                    <div class="input-group">
+                        <label for="{{ form.password.id_for_label }}">
+                            <span class="required">*</span> {{ form.password.label }}
+                        </label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-group">
+                        <label for="{{ form.password_confirm.id_for_label }}">
+                            <span class="required">*</span> {{ form.password_confirm.label }}
+                        </label>
+                        {{ form.password_confirm }}
+                        {% if form.password_confirm.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password_confirm.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row school-section">
+                    <div class="input-group">
+                        <label for="{{ form.school.id_for_label }}">
+                            <span class="required">*</span> {{ form.school.label }}
+                        </label>
+                        
+                        <!-- 搜索框 -->
+                        <div class="school-search-wrapper">
+                            <input type="text" 
+                                   id="schoolSearch" 
+                                   placeholder="输入学校名称关键词搜索..." 
+                                   autocomplete="off">
+                            <div id="searchResults" class="search-results"></div>
+                        </div>
+                        
+                        <!-- 原始下拉框（隐藏但保留功能） -->
+                        <div style="display: none;">
+                            {{ form.school }}
+                        </div>
+                        
+                        <!-- 显示已选择的学校 -->
+                        <div id="selectedSchool" class="selected-school">
+                            <span class="check-icon">✓</span>
+                            <span id="selectedSchoolName"></span>
+                            <button type="button" onclick="clearSchoolSelection()" class="clear-btn">✕ 重新选择</button>
+                        </div>
+                        
+                        {% if form.school.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.school.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <small class="field-hint warning">请选择您所属的学校，注册后不可更改！仅支持武汉市内的大学</small>
+                    </div>
+                </div>
+
+                <div class="form-row two-cols">
+                    <div class="input-group">
+                        <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.phone.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-group">
+                        <label for="{{ form.student_id.id_for_label }}">{{ form.student_id.label }}</label>
+                        {{ form.student_id }}
+                        {% if form.student_id.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.student_id.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="{{ form.dorm.id_for_label }}">{{ form.dorm.label }}</label>
+                        {{ form.dorm }}
+                        {% if form.dorm.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.dorm.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <button type="submit" class="submit-btn">
+                    <span>立即注册</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+                
+                <div class="form-footer">
+                    <span>已有账号？</span>
+                    <a href="{% url 'user_login' %}" class="login-link">立即登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .register-layout {
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        min-height: calc(100vh - 60px);
+        background: white;
+    }
+    
+    /* 左侧信息区域 */
+    .register-left {
+        background: #2a2a2a;
+        padding: 4rem 3rem;
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .info-content {
+        color: #e0e0e0;
+        width: 100%;
+    }
+    
+    .brand-section {
+        margin-bottom: 4rem;
+    }
+    
+    .brand-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .brand-section h1 {
+        font-size: 2rem;
+        font-weight: 400;
+        margin: 0 0 0.8rem 0;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+    }
+    
+    .brand-desc {
+        font-size: 0.9rem;
+        color: #999;
+        margin: 0;
+        font-weight: 300;
+    }
+    
+    .info-list {
+        display: grid;
+        gap: 2.5rem;
+        margin-bottom: 4rem;
+    }
+    
+    .info-item h3 {
+        margin: 0 0 0.6rem 0;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #ffffff;
+    }
+    
+    .info-item p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #999;
+        line-height: 1.6;
+        font-weight: 300;
+    }
+    
+    .note {
+        border-top: 1px solid #444;
+        padding-top: 1.5rem;
+    }
+    
+    .note p {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.85rem;
+        color: #999;
+        font-weight: 300;
+    }
+    
+    /* 右侧表单区域 */
+    .register-right {
+        padding: 4rem 3rem;
+        background: #fafafa;
+        overflow-y: auto;
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .register-container {
+        max-width: 650px;
+        margin: 0 auto;
+    }
+    
+    .register-header {
+        margin-bottom: 3rem;
+    }
+    
+    .register-header h2 {
+        font-size: 2rem;
+        font-weight: 400;
+        color: #2a2a2a;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .register-header p {
+        color: #999;
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 300;
+    }
+    
+    .register-form {
+        background: white;
+        padding: 2.5rem;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .form-row {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-row.two-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2rem;
+    }
+    
+    .input-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #2a2a2a;
+        font-weight: 400;
+        font-size: 0.9rem;
+    }
+    
+    .required {
+        color: #666;
+        margin-right: 0.2rem;
+    }
+    
+    .input-group input[type="text"],
+    .input-group input[type="password"],
+    .input-group input[type="email"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d0d0d0;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
+        background: #fafafa;
+    }
+    
+    .input-group input:focus {
+        outline: none;
+        border-color: #2563eb;
+        background: white;
+    }
+    
+    .field-hint {
+        display: block;
+        margin-top: 0.4rem;
+        color: #999;
+        font-size: 0.8rem;
+        font-weight: 300;
+    }
+    
+    .field-hint.warning {
+        color: #666;
+    }
+    
+    /* 学校选择区域 */
+    .school-section {
+        background: #f5f5f5;
+        padding: 1.5rem;
+        border: 1px solid #d0d0d0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .school-section label {
+        color: #2a2a2a;
+        font-size: 0.9rem;
+    }
+    
+    .school-search-wrapper {
+        position: relative;
+    }
+    
+    #schoolSearch {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d0d0d0;
+        font-size: 0.95rem;
+        background: white;
+    }
+    
+    #schoolSearch:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+    
+    .search-results {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #d0d0d0;
+        border-top: none;
+        max-height: 250px;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+    
+    .search-results.show {
+        display: block;
+    }
+    
+    .school-option {
+        padding: 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+        font-size: 0.9rem;
+    }
+    
+    .school-option:hover {
+        background: #fafafa;
+    }
+    
+    .school-option:last-child {
+        border-bottom: none;
+    }
+    
+    .selected-school {
+        display: none;
+        padding: 0.75rem;
+        background: white;
+        border: 1px solid #2563eb;
+        margin-top: 0.5rem;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .selected-school.show {
+        display: flex;
+    }
+    
+    .check-icon {
+        color: #2563eb;
+        font-weight: 400;
+        font-size: 1rem;
+    }
+    
+    .selected-school span:nth-child(2) {
+        flex: 1;
+        color: #2a2a2a;
+        font-weight: 400;
+        font-size: 0.9rem;
+    }
+    
+    .clear-btn {
+        background: #666;
+        color: white;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: background 0.2s;
+        font-weight: 300;
+    }
+    
+    .clear-btn:hover {
+        background: #2a2a2a;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        padding: 0.85rem;
+        background: #2563eb;
+        color: white;
+        border: none;
+        font-size: 0.95rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 2rem;
+    }
+    
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+    
+    .form-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e0e0e0;
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 300;
+    }
+    
+    .login-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 400;
+        margin-left: 0.3rem;
+        transition: opacity 0.2s;
+    }
+    
+    .login-link:hover {
+        opacity: 0.7;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 1200px) {
+        .register-layout {
+            grid-template-columns: 350px 1fr;
+        }
+    }
+    
+    @media (max-width: 1024px) {
+        .register-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .register-left {
+            display: none;
+        }
+        
+        .register-right {
+            padding: 2rem 1rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .form-row.two-cols {
+            grid-template-columns: 1fr;
+        }
+        
+        .register-form {
+            padding: 1.5rem;
+        }
+        
+        .register-header h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+// 学校搜索功能
+let allSchools = [];
+
+// 页面加载时获取所有学校选项
+document.addEventListener('DOMContentLoaded', function() {
+    const schoolSelect = document.querySelector('select[name="school"]');
+    const searchInput = document.getElementById('schoolSearch');
+    const searchResults = document.getElementById('searchResults');
+    
+    // 提取所有学校选项
+    if (schoolSelect) {
+        const options = schoolSelect.querySelectorAll('option');
+        options.forEach(option => {
+            if (option.value) {  // 排除空选项
+                allSchools.push({
+                    value: option.value,
+                    text: option.textContent.trim()
+                });
+            }
+        });
+    }
+    
+    // 搜索框获得焦点时显示所有学校
+    searchInput.addEventListener('focus', function() {
+        if (this.value.trim() === '') {
+            displayAllSchools();
+        }
+    });
+    
+    // 搜索输入事件
+    searchInput.addEventListener('input', function() {
+        const keyword = this.value.trim().toLowerCase();
+        
+        if (keyword === '') {
+            displayAllSchools();
+            return;
+        }
+        
+        // 过滤学校
+        const filtered = allSchools.filter(school => 
+            school.text.toLowerCase().includes(keyword)
+        );
+        
+        if (filtered.length === 0) {
+            searchResults.innerHTML = '<div style="padding: 1rem; color: #999; text-align: center;">未找到匹配的学校</div>';
+            searchResults.classList.add('show');
+            return;
+        }
+        
+        // 显示搜索结果
+        displaySchools(filtered);
+    });
+    
+    // 点击外部关闭搜索结果
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.remove('show');
+        }
+    });
+    
+    // 显示所有学校
+    function displayAllSchools() {
+        displaySchools(allSchools);
+    }
+    
+    // 显示学校列表
+    function displaySchools(schools) {
+        let html = '';
+        schools.forEach(school => {
+            html += `<div class="school-option" onclick="selectSchool(${school.value}, '${school.text.replace(/'/g, "\\'")}')">${school.text}</div>`;
+        });
+        
+        searchResults.innerHTML = html;
+        searchResults.classList.add('show');
+    }
+});
+
+// 选择学校
+function selectSchool(value, text) {
+    const schoolSelect = document.querySelector('select[name="school"]');
+    const searchInput = document.getElementById('schoolSearch');
+    const searchResults = document.getElementById('searchResults');
+    const selectedSchool = document.getElementById('selectedSchool');
+    const selectedSchoolName = document.getElementById('selectedSchoolName');
+    
+    // 设置选择值
+    schoolSelect.value = value;
+    
+    // 显示已选择的学校
+    selectedSchoolName.textContent = text;
+    selectedSchool.classList.add('show');
+    
+    // 隐藏搜索框和结果
+    searchInput.style.display = 'none';
+    searchResults.classList.remove('show');
+}
+
+// 清除学校选择
+function clearSchoolSelection() {
+    const schoolSelect = document.querySelector('select[name="school"]');
+    const searchInput = document.getElementById('schoolSearch');
+    const selectedSchool = document.getElementById('selectedSchool');
+    
+    // 清除选择
+    schoolSelect.value = '';
+    searchInput.value = '';
+    
+    // 显示搜索框，隐藏已选择提示
+    searchInput.style.display = 'block';
+    selectedSchool.classList.remove('show');
+    
+    // 聚焦搜索框
+    searchInput.focus();
+}
+</script>
+{% endblock %}
+

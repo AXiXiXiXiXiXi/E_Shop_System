@@ -1,0 +1,45 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}提交认领申请 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h2 class="text-center" style="margin-bottom: 2rem; color: #667eea;">✋ 提交认领申请</h2>
+    
+    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="color: #333; margin-bottom: 1rem;">失物信息</h3>
+        <p style="margin: 0.5rem 0;"><strong>标题：</strong>{{ lost_item.title }}</p>
+        <p style="margin: 0.5rem 0;"><strong>分类：</strong>{{ lost_item.get_category_display }}</p>
+        <p style="margin: 0.5rem 0;"><strong>丢失地点：</strong>{{ lost_item.lost_location }}</p>
+        <p style="margin: 0.5rem 0;"><strong>丢失时间：</strong>{{ lost_item.lost_time|date:"Y-m-d H:i" }}</p>
+    </div>
+
+    <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <p style="margin: 0; color: #856404;">
+            <strong>⚠️ 提示：</strong>请详细说明认领理由，包括物品特征、丢失经过等信息，以便管理员审核。
+        </p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.claim_reason.id_for_label }}">{{ form.claim_reason.label }} <span style="color: red;">*</span></label>
+            {{ form.claim_reason }}
+            {% if form.claim_reason.errors %}
+                <ul class="errorlist">
+                    {% for error in form.claim_reason.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">提交认领申请</button>
+            <a href="{% url 'lost_item_detail' lost_item.pk %}" class="btn btn-secondary" style="flex: 1; text-align: center; line-height: 2.5;">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

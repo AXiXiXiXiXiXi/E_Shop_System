@@ -1,0 +1,396 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+/* 隐藏Django消息框架 */
+.messagelist {
+    display: none !important;
+}
+
+.chat-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.chat-header {
+    background: #417690;
+    color: white;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.chat-info {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.chat-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    font-size: 14px;
+}
+
+.chat-info-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.chat-info-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.status-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-pending { background: #fff3cd; color: #856404; }
+.status-processing { background: #cce5ff; color: #0056b3; }
+.status-approved { background: #d4edda; color: #155724; }
+.status-rejected { background: #f8d7da; color: #721c24; }
+.status-completed { background: #d1ecf1; color: #0c5460; }
+
+.chat-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 20px;
+    background: #fafafa;
+}
+
+.message {
+    margin-bottom: 15px;
+    max-width: 70%;
+    clear: both;
+}
+
+.user-message {
+    float: right;
+    margin-left: 30%;
+}
+
+.admin-message {
+    float: left;
+    margin-right: 30%;
+}
+
+.message-content {
+    padding: 10px 15px;
+    border-radius: 12px;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.user-message .message-content {
+    background: #007bff;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.admin-message .message-content {
+    background: white;
+    color: #333;
+    border: 1px solid #dee2e6;
+    border-bottom-left-radius: 4px;
+}
+
+.message-meta {
+    font-size: 11px;
+    color: #6c757d;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.user-message .message-meta {
+    text-align: right;
+}
+
+.admin-message .message-meta {
+    text-align: left;
+}
+
+.sender-name {
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.chat-reply {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    background: white;
+}
+
+.reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.reply-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.reply-textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.reply-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+.empty-chat {
+    text-align: center;
+    color: #6c757d;
+    padding: 40px 20px;
+    font-style: italic;
+}
+
+.chat-disabled {
+    text-align: center;
+    padding: 20px;
+    background: #f8f9fa;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* 发送成功提示 */
+.send-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 14px;
+    display: none;
+}
+
+.send-success.show {
+    display: block;
+    animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>{{ title }}</h2>
+    </div>
+    
+    <div class="chat-info">
+        <div class="chat-info-grid">
+            <div class="chat-info-item">
+                <span class="chat-info-label">用户:</span>
+                <span>{{ after_sale_request.user.username }}</span>
+            </div>
+            <div class="chat-info-item">
+                <span class="chat-info-label">状态:</span>
+                <span class="status-badge status-{{ after_sale_request.status }}">
+                    {% if after_sale_request.status == 'pending' %}待处理
+                    {% elif after_sale_request.status == 'processing' %}处理中
+                    {% elif after_sale_request.status == 'approved' %}已批准
+                    {% elif after_sale_request.status == 'rejected' %}已拒绝
+                    {% elif after_sale_request.status == 'completed' %}已完成
+                    {% endif %}
+                </span>
+            </div>
+            <div class="chat-info-item">
+                <span class="chat-info-label">商品:</span>
+                <span>{{ after_sale_request.order_item.product_name }}</span>
+            </div>
+            <div class="chat-info-item">
+                <span class="chat-info-label">订单:</span>
+                <span>{{ after_sale_request.order_item.order.order_number }}</span>
+            </div>
+        </div>
+        <div style="margin-top: 10px;">
+            <span class="chat-info-label">申请原因:</span>
+            <span>{{ after_sale_request.reason }}</span>
+        </div>
+    </div>
+    
+    <div id="sendSuccess" class="send-success">
+        ✅ 消息发送成功
+    </div>
+    
+    <div class="chat-messages" id="chatMessages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.sender_type == 'user' %}user-message{% else %}admin-message{% endif %}">
+                    <div class="message-content">
+                        {{ message.message|linebreaks }}
+                    </div>
+                    <div class="message-meta">
+                        <span class="sender-name">
+                            {% if message.sender_type == 'user' %}
+                                {{ message.sender.username }}
+                            {% else %}
+                                客服 {{ message.sender.first_name|default:message.sender.username }}
+                            {% endif %}
+                        </span>
+                        <span>{{ message.created_at|date:"Y-m-d H:i:s" }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-chat">
+                暂无聊天记录
+            </div>
+        {% endif %}
+        <div class="clearfix"></div>
+    </div>
+    
+    {% if after_sale_request.can_chat %}
+        <div class="chat-reply">
+            <form method="post" action="{% url 'admin:review_aftersalerequest_send_reply' after_sale_request.pk %}" class="reply-form" id="replyForm">
+                {% csrf_token %}
+                <textarea name="message" class="reply-textarea" placeholder="输入您的回复..." required id="messageInput"></textarea>
+                <div class="reply-actions">
+                    <button type="submit" class="btn btn-primary" id="sendBtn">发送回复</button>
+                    <button type="submit" name="action" value="complete" class="btn btn-danger" 
+                            onclick="return confirm('确定要标记此售后申请为完成吗？完成后将无法继续聊天。')">
+                        标记完成
+                    </button>
+                    <a href="{% url 'admin:review_aftersalerequest_changelist' %}" class="btn btn-secondary">返回列表</a>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <div class="chat-disabled">
+            该售后申请已完成，聊天功能已关闭
+            <br><br>
+            <a href="{% url 'admin:review_aftersalerequest_changelist' %}" class="btn btn-secondary">返回列表</a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// 自动滚动到聊天底部
+function scrollToBottom() {
+    var chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+// 页面加载时滚动到底部
+document.addEventListener('DOMContentLoaded', function() {
+    scrollToBottom();
+});
+
+// 表单提交处理
+document.getElementById('replyForm').addEventListener('submit', function(e) {
+    var submitButton = e.submitter;
+    
+    // 如果是发送回复按钮
+    if (submitButton && submitButton.id === 'sendBtn') {
+        var messageInput = document.getElementById('messageInput');
+        if (messageInput.value.trim()) {
+            // 显示发送成功提示
+            var successDiv = document.getElementById('sendSuccess');
+            successDiv.classList.add('show');
+            
+            // 清空输入框
+            setTimeout(function() {
+                messageInput.value = '';
+                scrollToBottom();
+            }, 100);
+            
+            // 2秒后隐藏提示
+            setTimeout(function() {
+                successDiv.classList.remove('show');
+            }, 2000);
+        }
+    }
+});
+
+// 自动刷新聊天内容
+setInterval(function() {
+    // 每30秒自动刷新页面以获取新消息
+    if (document.visibilityState === 'visible') {
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %} 

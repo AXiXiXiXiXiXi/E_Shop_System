@@ -1,0 +1,64 @@
+node_modules
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Python 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+
+# Django 运行文件
+*.log
+db.sqlite3
+db.sqlite3-journal
+local_settings.py
+/staticfiles/
+/media/
+
+# 环境变量和密钥
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Node.js 和 React
+node_modules/
+frontend/build/
+dist/
+coverage/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE 和操作系统文件
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 数据库导出文件
+*.sql
+*.sql.gz
+*.dump
+
+# 本地临时备份
+*.py.bak
+*.py.new
+*.js.backup
+product_id_report.csv

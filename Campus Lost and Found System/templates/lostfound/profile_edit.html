@@ -1,0 +1,173 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}编辑个人信息 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 650px; margin: 0 auto;">
+    <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border-color);">
+        <h2 style="color: var(--text-primary); margin: 0; font-size: 1.3rem; font-weight: 600;">编辑个人信息</h2>
+        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0; font-size: 0.85rem;">修改您的联系方式和住址信息</p>
+    </div>
+
+    <!-- 不可编辑的信息展示 -->
+    <div style="background: var(--light-bg); padding: 1.2rem; border-radius: 4px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+        <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 600;">账户信息</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem;">
+            <div>
+                <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.4rem;">用户名</div>
+                <div style="color: var(--text-primary); font-weight: 500; font-size: 0.95rem;">{{ user.username }}</div>
+            </div>
+            <div>
+                <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.4rem;">所属学校</div>
+                <div style="color: var(--primary-color); font-weight: 500; font-size: 0.95rem;">
+                    {% if user.is_superuser %}
+                        无（超级管理员）
+                    {% else %}
+                        {{ profile.school.name }}
+                    {% endif %}
+                </div>
+            </div>
+            <div>
+                <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.4rem;">用户角色</div>
+                <div style="font-weight: 500; font-size: 0.95rem;">
+                    <span style="background: {% if user.is_superuser %}#fee2e2{% elif profile.role == 'admin' %}#fef3c7{% else %}#d1fae5{% endif %}; color: {% if user.is_superuser %}#991b1b{% elif profile.role == 'admin' %}#92400e{% else %}#065f46{% endif %}; padding: 0.2rem 0.6rem; border-radius: 3px; font-size: 0.85rem;">
+                        {% if user.is_superuser %}
+                            超级管理员
+                        {% elif profile.role == 'admin' %}
+                            管理员
+                        {% else %}
+                            普通用户
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 可编辑的表单 -->
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="background: #ffffff; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 1.5rem;">
+            <h4 style="margin: 0 0 1.2rem 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 600;">联系信息</h4>
+            
+            <div class="form-group">
+                <label for="{{ form.student_id.id_for_label }}" style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">
+                    {{ form.student_id.label }}
+                </label>
+                {{ form.student_id }}
+                {% if form.student_id.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.student_id.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.phone.id_for_label }}" style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">
+                    {{ form.phone.label }}
+                </label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.phone.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="{{ form.dorm.id_for_label }}" style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">
+                    {{ form.dorm.label }}
+                </label>
+                {{ form.dorm }}
+                {% if form.dorm.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.dorm.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.75rem;">
+                保存修改
+            </button>
+            <a href="{% url 'home' %}" class="btn btn-secondary" style="flex: 1; text-decoration: none; padding: 0.75rem;">
+                取消
+            </a>
+        </div>
+    </form>
+
+    <!-- 修改密码区域 -->
+    <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); padding: 1.5rem; border: 1px solid #fed7aa; border-radius: 4px; margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                    账户安全
+                </h4>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">定期修改密码可以提高账户安全性</p>
+            </div>
+            <a href="{% url 'password_change' %}" class="btn" style="background: #f97316; color: white; text-decoration: none; padding: 0.6rem 1.5rem; white-space: nowrap;">
+                修改密码
+            </a>
+        </div>
+    </div>
+
+    <!-- 密保问题设置区域 -->
+    <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 1.5rem; border: 1px solid #86efac; border-radius: 4px; margin-top: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+                <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                    密保问题
+                    {% if profile.has_security_question %}
+                    <span style="background: #22c55e; color: white; padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.75rem; font-weight: 500;">已设置</span>
+                    {% else %}
+                    <span style="background: #f59e0b; color: white; padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.75rem; font-weight: 500;">未设置</span>
+                    {% endif %}
+                </h4>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">
+                    {% if profile.has_security_question %}
+                        密保问题可用于找回密码，建议定期更新
+                    {% else %}
+                        设置密保问题后可用于找回密码，提高账户安全性
+                    {% endif %}
+                </p>
+            </div>
+            <a href="{% url 'security_question_set' %}" class="btn" style="background: #22c55e; color: white; text-decoration: none; padding: 0.6rem 1.5rem; white-space: nowrap;">
+                {% if profile.has_security_question %}修改密保{% else %}设置密保{% endif %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .card {
+            margin: 1rem !important;
+        }
+        
+        div[style*="display: flex; gap: 1rem"] {
+            flex-direction: column;
+        }
+        
+        div[style*="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))"] {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+{% endblock %}

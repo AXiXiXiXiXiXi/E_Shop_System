@@ -1,0 +1,87 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}{% if is_edit %}编辑{% else %}发布{% endif %}招领信息 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h2 class="text-center" style="margin-bottom: 2rem; color: #667eea;">
+        {% if is_edit %}✏️ 编辑招领信息{% else %}📝 发布招领信息{% endif %}
+    </h2>
+    
+    <div style="background: #d1ecf1; border: 1px solid #17a2b8; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <p style="margin: 0; color: #0c5460;">
+            <strong>💡 提示：</strong>
+            您发布的招领信息将自动绑定到 <strong>{{ school.name }}</strong>，仅本校用户可见。
+        </p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }} <span style="color: red;">*</span></label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <ul class="errorlist">{% for error in form.title.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.category.id_for_label }}">{{ form.category.label }} <span style="color: red;">*</span></label>
+            {{ form.category }}
+            {% if form.category.errors %}
+                <ul class="errorlist">{% for error in form.category.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">{{ form.description.label }} <span style="color: red;">*</span></label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <ul class="errorlist">{% for error in form.description.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.found_time.id_for_label }}">{{ form.found_time.label }} <span style="color: red;">*</span></label>
+            {{ form.found_time }}
+            {% if form.found_time.errors %}
+                <ul class="errorlist">{% for error in form.found_time.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.found_location.id_for_label }}">{{ form.found_location.label }} <span style="color: red;">*</span></label>
+            {{ form.found_location }}
+            {% if form.found_location.errors %}
+                <ul class="errorlist">{% for error in form.found_location.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }} <span style="color: red;">*</span></label>
+            {{ form.contact }}
+            {% if form.contact.errors %}
+                <ul class="errorlist">{% for error in form.contact.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+                <ul class="errorlist">{% for error in form.image.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                {% if is_edit %}保存修改{% else %}发布招领信息{% endif %}
+            </button>
+            <a href="{% if is_edit %}{% url 'found_item_detail' found_item.pk %}{% else %}{% url 'found_item_list' %}{% endif %}" 
+               class="btn btn-secondary" style="flex: 1; text-align: center; line-height: 2.5;">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

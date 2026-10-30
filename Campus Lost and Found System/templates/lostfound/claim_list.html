@@ -1,0 +1,73 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}认领申请 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #667eea; margin-bottom: 2rem;">
+        ✋ {% if is_admin %}认领申请管理{% else %}我的认领申请{% endif %}
+    </h2>
+
+    {% if is_admin %}
+    <div style="background: #d1ecf1; border: 1px solid #17a2b8; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <p style="margin: 0; color: #0c5460;">
+            <strong>管理员视图：</strong>您可以查看和审核本校所有认领申请
+        </p>
+    </div>
+    {% endif %}
+
+    {% if claims %}
+    <div style="display: grid; gap: 1rem;">
+        {% for claim in claims %}
+        <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; background: white;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: #333;">
+                    <a href="{% url 'lost_item_detail' claim.lost_item.pk %}" style="color: #667eea; text-decoration: none;">
+                        {{ claim.lost_item.title }}
+                    </a>
+                </h3>
+                <span style="background: {% if claim.status == 'pending' %}#fff3cd{% elif claim.status == 'approved' %}#d4edda{% else %}#f8d7da{% endif %}; 
+                             color: {% if claim.status == 'pending' %}#856404{% elif claim.status == 'approved' %}#155724{% else %}#721c24{% endif %}; 
+                             padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500;">
+                    {{ claim.get_status_display }}
+                </span>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>认领说明：</strong></div>
+                <p style="color: #666; margin: 0; line-height: 1.6;">{{ claim.claim_reason|truncatewords:50 }}</p>
+            </div>
+
+            <div style="color: #999; font-size: 0.85rem; margin-bottom: 1rem;">
+                <span>认领人：{{ claim.claim_user.username }}</span> | 
+                <span>📅 申请时间：{{ claim.create_time|date:"Y-m-d H:i" }}</span>
+                {% if claim.status != 'pending' %}
+                | <span>🕐 处理时间：{{ claim.update_time|date:"Y-m-d H:i" }}</span>
+                {% endif %}
+            </div>
+
+            {% if claim.admin_note %}
+            <div style="background: #e7f3ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <div style="color: #1976d2; font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>管理员备注：</strong></div>
+                <p style="color: #666; margin: 0;">{{ claim.admin_note }}</p>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 1rem;">
+                <a href="{% url 'claim_detail' claim.pk %}" class="btn btn-primary" style="flex: 1; text-align: center;">查看详情</a>
+                {% if is_admin and claim.status == 'pending' %}
+                <a href="{% url 'claim_review' claim.pk %}" class="btn btn-primary" style="flex: 1; text-align: center; background: #28a745;">审核</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: #999;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+        <p>{% if is_admin %}暂无认领申请{% else %}您还没有提交过认领申请{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,198 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}用户管理 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div style="display: grid; gap: 1.5rem;">
+
+    <!-- 页面标题 -->
+    <div class="card" style="background: var(--header-bg); color: white; padding: 1.5rem 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="margin: 0 0 0.3rem 0; font-size: 1.4rem; font-weight: 600;">用户管理</h2>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.85;">仅超级管理员可操作</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索与筛选栏 -->
+    <div class="card" style="padding: 1.2rem 1.5rem;">
+        <form method="get" action="{% url 'user_management_list' %}" style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+            <input
+                type="text"
+                name="search"
+                value="{{ search }}"
+                placeholder="按用户名搜索..."
+                class="form-control"
+                style="flex: 1; min-width: 160px; max-width: 300px;"
+            >
+            <select name="school" class="form-control" style="min-width: 160px; max-width: 240px;">
+                <option value="all" {% if school_filter == 'all' %}selected{% endif %}>全部学校</option>
+                {% for s in schools %}
+                <option value="{{ s.id }}" {% if school_filter == s.id|stringformat:'s' %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+                <option value="none" {% if school_filter == 'none' %}selected{% endif %}>未绑定学校</option>
+            </select>
+            <button type="submit" class="btn btn-primary" style="white-space: nowrap;">筛选</button>
+            {% if search or school_filter != 'all' %}
+            <a href="{% url 'user_management_list' %}" class="btn btn-secondary" style="white-space: nowrap;">重置</a>
+            {% endif %}
+        </form>
+        <p style="margin: 0.8rem 0 0 0; color: var(--text-muted); font-size: 0.875rem;">
+            {% if search %}搜索：<strong style="color: var(--text-primary);">{{ search }}</strong>，{% endif %}
+            {% if school_filter != 'all' %}
+                学校筛选：<strong style="color: var(--primary-color);">
+                {% if school_filter == 'none' %}未绑定学校
+                {% else %}{% for s in schools %}{% if s.id|stringformat:'s' == school_filter %}{{ s.name }}{% endif %}{% endfor %}{% endif %}
+                </strong>，
+            {% endif %}
+            共 {{ page_obj.paginator.count }} 名用户
+        </p>
+    </div>
+
+    <!-- 用户列表 -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        {% if page_obj.object_list %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead>
+                    <tr style="background: var(--light-bg); border-bottom: 2px solid var(--border-color);">
+                        <th style="padding: 0.9rem 1.2rem; text-align: left; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">用户名</th>
+                        <th style="padding: 0.9rem 1.2rem; text-align: left; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">所属学校</th>
+                        <th style="padding: 0.9rem 1.2rem; text-align: left; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">角色</th>
+                        <th style="padding: 0.9rem 1.2rem; text-align: left; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">状态</th>
+                        <th style="padding: 0.9rem 1.2rem; text-align: center; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in page_obj %}
+                    <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.15s;"
+                        onmouseover="this.style.background='var(--light-bg)'"
+                        onmouseout="this.style.background=''"
+                    >
+                        <!-- 用户名 -->
+                        <td style="padding: 0.9rem 1.2rem; font-weight: 500; color: var(--text-primary);">{{ u.username }}</td>
+
+                        <!-- 学校 -->
+                        <td style="padding: 0.9rem 1.2rem; color: var(--text-secondary);">
+                            {% if u.profile.school %}{{ u.profile.school.name }}{% else %}<span style="color: var(--text-muted);">未绑定</span>{% endif %}
+                        </td>
+
+                        <!-- 角色 -->
+                        <td style="padding: 0.9rem 1.2rem;">
+                            {% if u.profile.role == 'admin' %}
+                            <span style="background: #ebf4ff; color: #2b6cb0; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">管理员</span>
+                            {% else %}
+                            <span style="background: #f0fff4; color: #276749; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">普通用户</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- 状态 -->
+                        <td style="padding: 0.9rem 1.2rem;">
+                            {% if u.is_active %}
+                            <span style="background: #f0fff4; color: #276749; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">正常</span>
+                            {% else %}
+                            <span style="background: #fff5f5; color: #c53030; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">已禁用</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- 操作按钮 -->
+                        <td style="padding: 0.9rem 1.2rem; text-align: center; white-space: nowrap;">
+                            <!-- 切换角色 -->
+                            <form method="post" action="{% url 'user_toggle_role' u.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="btn"
+                                    style="padding: 0.35rem 0.8rem; font-size: 0.8rem; margin: 0.15rem;
+                                        background: {% if u.profile.role == 'admin' %}#718096{% else %}#3182ce{% endif %};
+                                        color: white;"
+                                >
+                                    {% if u.profile.role == 'admin' %}设为普通用户{% else %}设为管理员{% endif %}
+                                </button>
+                            </form>
+
+                            <!-- 启用/禁用 -->
+                            <form method="post" action="{% url 'user_toggle_active' u.id %}" style="display: inline;"
+                                onsubmit="return confirmToggle(this, '{{ u.username }}', {{ u.is_active|yesno:'true,false' }})">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="btn"
+                                    style="padding: 0.35rem 0.8rem; font-size: 0.8rem; margin: 0.15rem;
+                                        background: {% if u.is_active %}#e53e3e{% else %}#38a169{% endif %};
+                                        color: white;"
+                                >
+                                    {% if u.is_active %}禁用{% else %}启用{% endif %}
+                                </button>
+                            </form>
+
+                            <!-- 重置密码 -->
+                            <form method="post" action="{% url 'user_reset_password' u.id %}" style="display: inline;"
+                                onsubmit="return confirmReset('{{ u.username }}')">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="btn"
+                                    style="padding: 0.35rem 0.8rem; font-size: 0.8rem; margin: 0.15rem;
+                                        background: #d69e2e; color: white;"
+                                >
+                                    重置密码
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        {% if page_obj.has_other_pages %}
+        <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: center; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if school_filter != 'all' %}&school={{ school_filter }}{% endif %}"
+               style="padding: 0.4rem 0.8rem; border: 1px solid var(--border-color); border-radius: 4px; color: var(--primary-color); text-decoration: none; font-size: 0.875rem; transition: all 0.2s;"
+               onmouseover="this.style.background='var(--light-bg)'" onmouseout="this.style.background=''"
+            >上一页</a>
+            {% endif %}
+
+            <span style="color: var(--text-muted); font-size: 0.875rem;">
+                第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 页
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if school_filter != 'all' %}&school={{ school_filter }}{% endif %}"
+               style="padding: 0.4rem 0.8rem; border: 1px solid var(--border-color); border-radius: 4px; color: var(--primary-color); text-decoration: none; font-size: 0.875rem; transition: all 0.2s;"
+               onmouseover="this.style.background='var(--light-bg)'" onmouseout="this.style.background=''"
+            >下一页</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div style="text-align: center; padding: 3rem 2rem; color: var(--text-muted);">
+
+            <p style="font-size: 1rem; margin: 0;">{% if search or school_filter != 'all' %}未找到匹配的用户{% else %}暂无用户数据{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmToggle(form, username, isActive) {
+    var action = isActive ? '禁用' : '启用';
+    var msg = '确认要' + action + '用户 ' + username + ' 吗？';
+    if (isActive) {
+        msg += '\n禁用后该用户将无法登录。';
+    } else {
+        msg += '\n启用后该用户可以正常登录。';
+    }
+    return confirm(msg);
+}
+
+function confirmReset(username) {
+    return confirm('确认要重置用户 ' + username + ' 的密码吗？\n新密码将被设置为：123456\n请在操作后通知该用户。');
+}
+</script>
+{% endblock %}

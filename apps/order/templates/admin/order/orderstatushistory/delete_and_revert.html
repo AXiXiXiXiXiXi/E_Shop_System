@@ -1,0 +1,99 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style type="text/css">
+        .confirmation-box {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .status-info {
+            margin-bottom: 20px;
+        }
+        .warning-box {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #f8d7da;
+            border-radius: 5px;
+            background-color: #fff3f3;
+            color: #721c24;
+        }
+        .status-change {
+            padding: 10px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+            margin: 15px 0;
+            background-color: #fff;
+        }
+        .status-from {
+            color: #721c24;
+            text-decoration: line-through;
+        }
+        .status-to {
+            color: #155724;
+            font-weight: bold;
+        }
+        .button-row {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .confirm-button {
+            padding: 8px 16px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .cancel-button {
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ title }}</h1>
+    
+    <div class="status-info">
+        <p>订单: <strong>{{ order.order_number }}</strong></p>
+        <p>当前订单状态: <strong>{{ order.get_status_display }}</strong></p>
+    </div>
+    
+    <div class="warning-box">
+        <h3>警告：此操作不可逆！</h3>
+        <p>您即将删除以下状态变更记录：</p>
+        
+        <div class="status-change">
+            <p>时间: {{ status_history.created_at }}</p>
+            <p>操作人: {{ status_history.operator }}</p>
+            <p>状态变更: <span class="status-from">{{ from_status_display }}</span> → <span class="status-to">{{ to_status_display }}</span></p>
+            <p>备注: {{ status_history.remark }}</p>
+        </div>
+        
+        {% if status_history.id == latest_history.id %}
+        <p><strong>注意:</strong> 这是该订单的最新状态变更记录。删除此记录将会将订单状态恢复为 <strong>{{ from_status_display }}</strong>。</p>
+        {% else %}
+        <p><strong>注意:</strong> 这不是该订单的最新状态变更记录。删除此记录不会改变订单当前状态。</p>
+        {% endif %}
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="button-row">
+            <button type="submit" name="confirm" value="yes" class="confirm-button">确认删除并恢复状态</button>
+            <a href="{% url 'admin:order_orderstatushistory_changelist' %}" class="cancel-button">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 

@@ -1,0 +1,107 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style type="text/css">
+        .status-form {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .status-form select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 200px;
+            margin-right: 10px;
+        }
+        .status-form button {
+            padding: 8px 16px;
+            background-color: #79aec8;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .status-form button:hover {
+            background-color: #417690;
+        }
+        .status-info {
+            margin-bottom: 20px;
+        }
+        .status-preview {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .status-preview-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusSelect = document.getElementById('id_new_status');
+            const previewContent = document.getElementById('status-preview-content');
+            
+            function updatePreview() {
+                const selectedOption = statusSelect.options[statusSelect.selectedIndex];
+                const statusText = selectedOption.text;
+                const now = new Date();
+                const dateStr = now.getFullYear() + '/' + 
+                               (now.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                               now.getDate().toString().padStart(2, '0') + ' ' +
+                               now.getHours().toString().padStart(2, '0') + ':' +
+                               now.getMinutes().toString().padStart(2, '0') + ':' +
+                               now.getSeconds().toString().padStart(2, '0');
+                
+                previewContent.innerHTML = dateStr + '<br>' + 
+                                          statusText + '<br>' +
+                                          '操作人：{{ request.user.username }}';
+            }
+            
+            statusSelect.addEventListener('change', updatePreview);
+            
+            // 初始化预览
+            updatePreview();
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ title }}</h1>
+    
+    <div class="status-info">
+        <p>当前订单: <strong>{{ order.order_number }}</strong></p>
+        <p>当前状态: <strong>{{ current_status_display }}</strong></p>
+    </div>
+    
+    <form method="post" class="status-form">
+        {% csrf_token %}
+        <div>
+            <label for="id_new_status">选择新状态:</label>
+            <select name="new_status" id="id_new_status" required>
+                {% for status_code, status_name in status_choices %}
+                <option value="{{ status_code }}" {% if status_code == current_status %}selected{% endif %}>{{ status_name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">更新状态</button>
+        </div>
+        
+        <div class="status-preview">
+            <div class="status-preview-title">状态更新预览 (将显示在前端):</div>
+            <div id="status-preview-content"></div>
+        </div>
+    </form>
+    
+    <div class="submit-row">
+        <a href="{% url 'admin:order_order_change' original.pk %}" class="button cancel-link">返回</a>
+    </div>
+</div>
+{% endblock %} 

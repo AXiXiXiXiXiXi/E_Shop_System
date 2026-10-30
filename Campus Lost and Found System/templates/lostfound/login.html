@@ -1,0 +1,365 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}用户登录 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div class="split-layout">
+    <!-- 左侧信息区域 -->
+    <div class="split-left">
+        <div class="visual-content">
+            <div class="logo-section">
+                <div class="logo-icon">🎓</div>
+                <h1>校园失物招领系统</h1>
+                <p class="tagline">Campus Lost and Found</p>
+            </div>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <span class="feature-icon">—</span>
+                    <div>
+                        <h3>数据隔离</h3>
+                        <p>各学校数据独立管理</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">—</span>
+                    <div>
+                        <h3>信息发布</h3>
+                        <p>快速发布失物招领信息</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">—</span>
+                    <div>
+                        <h3>在线认领</h3>
+                        <p>提交认领申请并审核</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="system-note">
+                <p>本系统仅供在校师生使用</p>
+                <p>登录后只能查看本校信息</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧表单区域 -->
+    <div class="split-right">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>登录</h2>
+                <p>Login to your account</p>
+            </div>
+            
+            <form method="post" class="login-form">
+                {% csrf_token %}
+                
+                <div class="input-group">
+                    <label for="{{ form.username.id_for_label }}">用户名</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.password.id_for_label }}">密码</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.password.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember">
+                        <span>记住我</span>
+                    </label>
+                    <a href="{% url 'forgot_password_step1' %}" class="forgot-link">忘记密码</a>
+                </div>
+
+                <button type="submit" class="submit-btn">登录</button>
+                
+                <div class="form-footer">
+                    <span>还没有账号？</span>
+                    <a href="{% url 'user_register' %}" class="register-link">注册</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .split-layout {
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        min-height: calc(100vh - 60px);
+        background: white;
+    }
+    
+    /* 左侧信息区域 */
+    .split-left {
+        background: #2a2a2a;
+        padding: 4rem 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .visual-content {
+        color: #e0e0e0;
+        max-width: 100%;
+    }
+    
+    .logo-section {
+        margin-bottom: 4rem;
+    }
+    
+    .logo-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .logo-section h1 {
+        font-size: 1.5rem;
+        font-weight: 400;
+        margin: 0 0 0.8rem 0;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+    }
+    
+    .tagline {
+        font-size: 0.9rem;
+        color: #999;
+        margin: 0;
+        font-weight: 300;
+    }
+    
+    .features {
+        display: grid;
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: start;
+        gap: 1rem;
+    }
+    
+    .feature-icon {
+        font-size: 1rem;
+        color: #666;
+        flex-shrink: 0;
+        margin-top: 0.2rem;
+    }
+    
+    .feature-item h3 {
+        margin: 0 0 0.4rem 0;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #ffffff;
+    }
+    
+    .feature-item p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #999;
+        font-weight: 300;
+    }
+    
+    .system-note {
+        border-top: 1px solid #444;
+        padding-top: 1.5rem;
+    }
+    
+    .system-note p {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.85rem;
+        color: #999;
+        font-weight: 300;
+    }
+    
+    /* 右侧表单区域 */
+    .split-right {
+        padding: 4rem 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fafafa;
+    }
+    
+    .form-container {
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .form-header {
+        margin-bottom: 3rem;
+    }
+    
+    .form-header h2 {
+        font-size: 2rem;
+        font-weight: 400;
+        color: #2a2a2a;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .form-header p {
+        color: #999;
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 300;
+    }
+    
+    .login-form {
+        background: white;
+        padding: 2.5rem;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .input-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .input-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #2a2a2a;
+        font-weight: 400;
+        font-size: 0.9rem;
+    }
+    
+    .input-group input[type="text"],
+    .input-group input[type="password"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d0d0d0;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
+        background: #fafafa;
+    }
+    
+    .input-group input:focus {
+        outline: none;
+        border-color: #2563eb;
+        background: white;
+    }
+    
+    .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        margin: 0;
+    }
+    
+    .checkbox-label input {
+        cursor: pointer;
+    }
+    
+    .checkbox-label span {
+        color: #666;
+        font-size: 0.85rem;
+        font-weight: 300;
+    }
+    
+    .forgot-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 300;
+        transition: color 0.2s;
+    }
+    
+    .forgot-link:hover {
+        color: #1d4ed8;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        padding: 0.85rem;
+        background: #2563eb;
+        color: white;
+        border: none;
+        font-size: 0.95rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+    
+    .form-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e0e0e0;
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 300;
+    }
+    
+    .register-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 400;
+        margin-left: 0.3rem;
+        transition: opacity 0.2s;
+    }
+    
+    .register-link:hover {
+        opacity: 0.7;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 1024px) {
+        .split-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .split-left {
+            display: none;
+        }
+        
+        .split-right {
+            padding: 2rem 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .login-form {
+            padding: 1.5rem;
+        }
+        
+        .form-header h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+

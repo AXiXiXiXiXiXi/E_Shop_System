@@ -1,0 +1,123 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}{% if is_edit %}编辑{% else %}发布{% endif %}失物信息 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h2 class="text-center" style="margin-bottom: 2rem; color: #667eea;">
+        {% if is_edit %}✏️ 编辑失物信息{% else %}📝 发布失物信息{% endif %}
+    </h2>
+    
+    <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <p style="margin: 0; color: #856404;">
+            <strong>⚠️ 学校数据提示：</strong>
+            您发布的失物信息将自动绑定到 <strong>{{ school.name }}</strong>，仅本校用户可见。
+        </p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }} <span style="color: red;">*</span></label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <ul class="errorlist">
+                    {% for error in form.title.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.category.id_for_label }}">{{ form.category.label }} <span style="color: red;">*</span></label>
+            {{ form.category }}
+            {% if form.category.errors %}
+                <ul class="errorlist">
+                    {% for error in form.category.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">{{ form.description.label }} <span style="color: red;">*</span></label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <ul class="errorlist">
+                    {% for error in form.description.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <small style="color: #666; display: block; margin-top: 0.25rem;">
+                请详细描述失物特征，以便失主辨认
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.lost_time.id_for_label }}">{{ form.lost_time.label }} <span style="color: red;">*</span></label>
+            {{ form.lost_time }}
+            {% if form.lost_time.errors %}
+                <ul class="errorlist">
+                    {% for error in form.lost_time.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.lost_location.id_for_label }}">{{ form.lost_location.label }} <span style="color: red;">*</span></label>
+            {{ form.lost_location }}
+            {% if form.lost_location.errors %}
+                <ul class="errorlist">
+                    {% for error in form.lost_location.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }} <span style="color: red;">*</span></label>
+            {{ form.contact }}
+            {% if form.contact.errors %}
+                <ul class="errorlist">
+                    {% for error in form.contact.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+                <ul class="errorlist">
+                    {% for error in form.image.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <small style="color: #666; display: block; margin-top: 0.25rem;">
+                上传失物照片有助于失主辨认（可选）
+            </small>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                {% if is_edit %}保存修改{% else %}发布失物信息{% endif %}
+            </button>
+            <a href="{% if is_edit %}{% url 'lost_item_detail' lost_item.pk %}{% else %}{% url 'lost_item_list' %}{% endif %}" 
+               class="btn btn-secondary" style="flex: 1; text-align: center; line-height: 2.5;">
+                取消
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

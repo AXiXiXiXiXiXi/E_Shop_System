@@ -1,0 +1,164 @@
+{% extends 'lostfound/base.html' %}
+
+{% block title %}数据隔离说明 - 校园失物招领系统{% endblock %}
+
+{% block content %}
+<div class="data-isolation-container">
+    <div class="data-isolation-header">
+        <h1>数据隔离与信息安全说明</h1>
+        <p>本校园失物招领平台采用严格的数据隔离机制，以保障各学校用户的信息安全与隐私权益。</p>
+    </div>
+
+    <div class="data-isolation-content">
+        <section class="data-isolation-section">
+            <h2>数据隔离机制</h2>
+            
+            <div class="data-isolation-item">
+                <h3>学校维度隔离</h3>
+                <p>平台按照"学校维度"对数据进行隔离管理。</p>
+            </div>
+
+            <div class="data-isolation-item">
+                <h3>仅限本校访问</h3>
+                <p>用户仅可查看和操作本人所属学校的失物、招领、公告等信息。</p>
+            </div>
+
+            <div class="data-isolation-item">
+                <h3>数据相互独立</h3>
+                <p>不同学校之间的数据相互独立、互不可见。</p>
+            </div>
+
+            <div class="data-isolation-item">
+                <h3>权限范围限制</h3>
+                <p>校级管理员仅具备本校范围内的数据管理与审核权限。</p>
+            </div>
+
+            <div class="data-isolation-item">
+                <h3>系统级安全保障</h3>
+                <p>系统从设计层面杜绝跨校数据访问，确保信息使用合规、安全、可控。</p>
+            </div>
+        </section>
+
+        <section class="data-isolation-section">
+            <h2>安全保障</h2>
+            <div class="data-isolation-notice">
+                <p>该机制有效防止了信息混用与越权访问，保障校园数据的独立性与安全性。</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="data-isolation-footer">
+        <a href="{% url 'home' %}" class="btn btn-primary">← 返回首页</a>
+    </div>
+</div>
+
+<style>
+    .data-isolation-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .data-isolation-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .data-isolation-header h1 {
+        font-size: 2rem;
+        color: #2a2a2a;
+        margin: 0 0 1rem 0;
+        font-weight: 400;
+    }
+
+    .data-isolation-header p {
+        font-size: 1rem;
+        color: #666;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .data-isolation-content {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .data-isolation-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .data-isolation-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .data-isolation-section h2 {
+        font-size: 1.3rem;
+        color: #2a2a2a;
+        margin: 0 0 1.5rem 0;
+        font-weight: 500;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .data-isolation-item {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .data-isolation-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .data-isolation-item h3 {
+        font-size: 1rem;
+        color: #2a2a2a;
+        margin: 0 0 0.5rem 0;
+        font-weight: 500;
+    }
+
+    .data-isolation-item p {
+        color: #666;
+        margin: 0;
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    .data-isolation-notice {
+        background: #f5f5f5;
+        padding: 1.5rem;
+        border-radius: 6px;
+    }
+
+    .data-isolation-notice p {
+        color: #2a2a2a;
+        margin: 0;
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    .data-isolation-footer {
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .data-isolation-container {
+            padding: 1rem;
+        }
+
+        .data-isolation-content {
+            padding: 1.5rem;
+        }
+
+        .data-isolation-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
