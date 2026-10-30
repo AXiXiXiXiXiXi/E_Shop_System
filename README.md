@@ -382,3 +382,21 @@ location / {
 
 检查 MEDIA_ROOT 对应目录及 Nginx 的 /media/ 配置，并确保 Gunicorn 和 Nginx 运行用户具有目录读取权限。
 
+## 12. 项目界面展示
+
+| 首页 | 商品列表 |
+| :---: | :---: |
+| ![首页](img/01-homepage.png) | ![商品列表](img/02-product-list.png) |
+
+| 新品上市 | 推荐商品 |
+| :---: | :---: |
+| ![新品上市](img/03-new-products.png) | ![推荐商品](img/04-featured-products.png) |
+
+| 购物车 | 登录页面 |
+| :---: | :---: |
+| ![购物车](img/05-cart.png) | ![登录页面](img/06-login.png) |
+
+| 会员中心 |
+| :---: |
+| ![会员中心](img/07-member-center.png) |
+
