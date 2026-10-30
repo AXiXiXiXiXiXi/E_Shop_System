@@ -382,10 +382,3 @@ location / {
 
 检查 MEDIA_ROOT 对应目录及 Nginx 的 /media/ 配置，并确保 Gunicorn 和 Nginx 运行用户具有目录读取权限。
 
-## 12. 安全提醒
-
-- 不要把真实 .env、数据库密码或 Django 密钥提交到 GitHub。
-- 生产环境必须设置 DJANGO_DEBUG=False。
-- 不要上传包含真实用户数据的数据库导出文件。
-- 如果默认数据库密码曾经被提交过，应立即修改数据库密码。
-- 建议为生产数据库使用独立账号，不要直接使用 MySQL root。
